@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Anyone can read content (for browsing), but not write
+    match /content/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Temporary: Allow all authenticated users to write (for testing)
+    // Remove this in production
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

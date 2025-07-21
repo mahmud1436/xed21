@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - XED21</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: var(--white);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            background: var(--gradient);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-info h3 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-info p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: background 0.3s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: var(--bg-light);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            color: var(--text-dark);
+        }
+
+        .logout-btn {
+            background: var(--gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Grade Grid */
+        .grades-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .grades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .grade-card {
+            background: var(--white);
+            padding: 2rem 1rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .grade-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-card h3 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .grade-card p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* Subjects View */
+        .subjects-view {
+            display: none;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .subject-card h3 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-card p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            transition: width 0.3s;
+        }
+
+        /* Topics View */
+        .topics-view {
+            display: none;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .topic-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topic-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-number {
+            background: var(--gradient);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .topic-info h4 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .topic-info p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Subscription Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .pricing-options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-option {
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pricing-option:hover,
+        .pricing-option.selected {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .pricing-option h3 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-option .price {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .subscribe-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--white);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .grades-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>XED21</h2>
+        </div>
+        <div class="user-info">
+            <h3 id="userName">Loading...</h3>
+            <p id="userEmail">...</p>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="nav-item active" onclick="showGrades()">📚 All Grades</button>
+            <button class="nav-item" onclick="showMySubjects()">📖 My Subjects</button>
+            <button class="nav-item" onclick="showProgress()">📊 Progress</button>
+            <button class="nav-item" onclick="showSettings()">⚙️ Settings</button>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1>Choose Your Grade</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Grades Grid -->
+        <section class="grades-section" id="gradesView">
+            <p class="section-title">Select a grade to explore subjects</p>
+            <div class="grades-grid" id="gradesGrid">
+                <!-- Grades will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Subjects View -->
+        <section class="subjects-view" id="subjectsView">
+            <button class="back-btn" onclick="showGrades()">← Back to Grades</button>
+            <h2 class="section-title" id="gradeTitle">Grade X Subjects</h2>
+            <div class="subjects-grid" id="subjectsGrid">
+                <!-- Subjects will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Topics View -->
+        <section class="topics-view" id="topicsView">
+            <button class="back-btn" onclick="backToSubjects()">← Back to Subjects</button>
+            <h2 class="section-title" id="subjectTitle">Subject Topics</h2>
+            <div class="topics-grid" id="topicsGrid">
+                <!-- Topics will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Subscription Modal -->
+    <div class="modal" id="subscriptionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Subscribe to Unlock</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCugrlHaXUICVFJElzdB7jc8it4K6uxia8",
+            authDomain: "xed21-application.firebaseapp.com",
+            projectId: "xed21-application",
+            storageBucket: "xed21-application.firebasestorage.app",
+            messagingSenderId: "606962635972",
+            appId: "1:606962635972:web:4ff09b7fad7e9860c3a591"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        let currentUser = null;
+        let currentGrade = null;
+        let currentSubject = null;
+        let userSubscriptions = [];
+
+        // Check authentication
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userName').textContent = user.displayName || 'Student';
+                document.getElementById('userEmail').textContent = user.email;
+                
+                // Load user data
+                await loadUserData();
+                loadGrades();
+            } else {
+                // Not logged in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load user data including subscriptions
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    userSubscriptions = userData.subscriptions || [];
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Load grades
+        function loadGrades() {
+            const gradesGrid = document.getElementById('gradesGrid');
+            gradesGrid.innerHTML = '';
+
+            for (let i = 1; i <= 10; i++) {
+                const gradeCard = document.createElement('div');
+                gradeCard.className = 'grade-card';
+                gradeCard.innerHTML = `
+                    <h3>Grade ${i}</h3>
+                    <p>NCERT Curriculum</p>
+                `;
+                gradeCard.onclick = () => showSubjects(i);
+                gradesGrid.appendChild(gradeCard);
+            }
+        }
+
+        // Show subjects for a grade
+        async function showSubjects(grade) {
+            currentGrade = grade;
+            document.getElementById('gradesView').style.display = 'none';
+            document.getElementById('subjectsView').style.display = 'block';
+            document.getElementById('gradeTitle').textContent = `Grade ${grade} Subjects`;
+
+            const subjectsGrid = document.getElementById('subjectsGrid');
+            subjectsGrid.innerHTML = '<div class="loading">Loading subjects</div>';
+
+            try {
+                // Get subjects for this grade
+                const subjectsSnapshot = await db.collection('content')
+                    .where('grade', '==', grade)
+                    .get();
+
+                const subjects = new Set();
+                subjectsSnapshot.forEach(doc => {
+                    subjects.add(doc.data().subject);
+                });
+
+                subjectsGrid.innerHTML = '';
+
+                // Subject icons mapping
+                const subjectIcons = {
+                    'Mathematics': '🔢',
+                    'Science': '🔬',
+                    'English': '📝',
+                    'Hindi': '🇮🇳',
+                    'Social Science': '🌍',
+                    'Computer Science': '💻',
+                    'Physics': '⚡',
+                    'Chemistry': '🧪',
+                    'Biology': '🌿'
+                };
+
+                subjects.forEach(subject => {
+                    const isSubscribed = checkSubscription(grade, subject);
+                    const subjectCard = document.createElement('div');
+                    subjectCard.className = `subject-card ${!isSubscribed ? 'locked' : ''}`;
+                    subjectCard.innerHTML = `
+                        <div class="subject-icon">${subjectIcons[subject] || '📚'}</div>
+                        <h3>${subject}</h3>
+                        <p>${isSubscribed ? 'Click to explore topics' : 'Subscribe to unlock'}</p>
+                        ${isSubscribed ? '<div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>' : ''}
+                    `;
+                    subjectCard.onclick = () => isSubscribed ? showTopics(subject) : showSubscriptionModal(grade, subject);
+                    subjectsGrid.appendChild(subjectCard);
+                });
+
+                if (subjects.size === 0) {
+                    subjectsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light);">No subjects available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+                subjectsGrid.innerHTML = '<p style="text-align: center; color: var(--error);">Error loading subjects. Please try again.</p>';
+            }
+        }
+
+        // Show topics for a subject
+        async function showTopics(subject) {
+            currentSubject = subject;
+            document.getElementById('subjectsView').style.display = 'none';
+            document.getElementById('topicsView').style.display = 'block';
+            document.getElementById('subjectTitle').textContent = `${subject} - Grade ${currentGrade}`;
+
+            const topicsGrid = document.getElementById('topicsGrid');
+            topicsGrid.innerHTML = '<div class="loading">Loading topics</div>';
+
+            try {
+                const topicsSnapshot = await db.collection('content')
+                    .where('grade', '==', currentGrade)
+                    .where('subject', '==', subject)
+                    .orderBy('topicNumber')
+                    .get();
+
+                topicsGrid.innerHTML = '';
+
+                topicsSnapshot.forEach((doc, index) => {
+                    const topic = doc.data();
+                    const topicCard = document.createElement('div');
+                    topicCard.className = 'topic-card';
+                    topicCard.innerHTML = `
+                        <div class="topic-number">${index + 1}</div>
+                        <div class="topic-info">
+                            <h4>${topic.topicName}</h4>
+                            <p>Click to start learning</p>
+                        </div>
+                    `;
+                    topicCard.onclick = () => openTopic(topic.htmlUrl);
+                    topicsGrid.appendChild(topicCard);
+                });
+
+                if (topicsSnapshot.empty) {
+                    topicsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light);">No topics available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading topics:', error);
+                topicsGrid.innerHTML = '<p style="text-align: center; color: var(--error);">Error loading topics. Please try again.</p>';
+            }
+        }
+
+        // Open topic content
+        function openTopic(htmlUrl) {
+            if (htmlUrl) {
+                window.open(htmlUrl, '_blank');
+            } else {
+                alert('Content not available yet.');
+            }
+        }
+
+        // Check if user has subscription
+        function checkSubscription(grade, subject) {
+            return userSubscriptions.some(sub => 
+                (sub.type === 'grade' && sub.grade === grade) ||
+                (sub.type === 'subject' && sub.grade === grade && sub.subject === subject)
+            );
+        }
+
+        // Show subscription modal
+        function showSubscriptionModal(grade, subject) {
+            const modal = document.getElementById('subscriptionModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="pricing-options">
+                    <div class="pricing-option" onclick="selectPricing('subject')">
+                        <h3>${subject} Only</h3>
+                        <p class="price">₹100/month</p>
+                        <p style="font-size: 0.875rem; color: var(--text-light);">Access all ${subject} topics for Grade ${grade}</p>
+                    </div>
+                    <div class="pricing-option" onclick="selectPricing('grade')">
+                        <h3>Full Grade ${grade}</h3>
+                        <p class="price">₹800/month</p>
+                        <p style="font-size: 0.875rem; color: var(--success);">Save 20% - Access all subjects!</p>
+                    </div>
+                </div>
+                <button class="subscribe-btn" onclick="processPayment('${grade}', '${subject}')">Continue to Payment</button>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        let selectedPricing = null;
+
+        function selectPricing(type) {
+            selectedPricing = type;
+            document.querySelectorAll('.pricing-option').forEach(opt => opt.classList.remove('selected'));
+            event.target.closest('.pricing-option').classList.add('selected');
+        }
+
+        // Process payment (integrate with Razorpay)
+        async function processPayment(grade, subject) {
+            if (!selectedPricing) {
+                alert('Please select a subscription option');
+                return;
+            }
+
+            // This is where you would integrate Razorpay
+            // For now, we'll simulate a successful payment
+            alert('Payment integration will be added here. For demo, subscription will be activated.');
+
+            try {
+                // Add subscription to user's account
+                const subscription = {
+                    type: selectedPricing,
+                    grade: parseInt(grade),
+                    subject: selectedPricing === 'subject' ? subject : null,
+                    startDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                };
+
+                await db.collection('users').doc(currentUser.uid).update({
+                    subscriptions: firebase.firestore.FieldValue.arrayUnion(subscription)
+                });
+
+                // Reload user data
+                await loadUserData();
+                closeModal();
+                
+                // Refresh the current view
+                if (selectedPricing === 'subject') {
+                    showTopics(subject);
+                } else {
+                    showSubjects(grade);
+                }
+
+                alert('Subscription activated successfully!');
+            } catch (error) {
+                console.error('Error processing subscription:', error);
+                alert('Error processing subscription. Please try again.');
+            }
+        }
+
+        // Navigation functions
+        function showGrades() {
+            document.getElementById('gradesView').style.display = 'block';
+            document.getElementById('subjectsView').style.display = 'none';
+            document.getElementById('topicsView').style.display = 'none';
+            updateActiveNav(0);
+        }
+
+        function backToSubjects() {
+            document.getElementById('topicsView').style.display = 'none';
+            document.getElementById('subjectsView').style.display = 'block';
+        }
+
+        function showMySubjects() {
+            // Show only subscribed subjects
+            alert('My Subjects view coming soon!');
+            updateActiveNav(1);
+        }
+
+        function showProgress() {
+            alert('Progress tracking coming soon!');
+            updateActiveNav(2);
+        }
+
+        function showSettings() {
+            alert('Settings coming soon!');
+            updateActiveNav(3);
+        }
+
+        function updateActiveNav(index) {
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('subscriptionModal').style.display = 'none';
+            selectedPricing = null;
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+
+        // Mobile menu toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('subscriptionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
