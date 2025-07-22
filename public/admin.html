@@ -361,6 +361,22 @@
             display: none;
         }
 
+        .debug-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -383,6 +399,9 @@
 <body>
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Debug Info -->
+    <div class="debug-info" id="debugInfo"></div>
 
     <!-- Admin Login -->
     <div class="login-container" id="loginSection">
@@ -552,42 +571,111 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
 
     <script>
+        // Enable debug mode (set to false in production)
+        const DEBUG_MODE = false;
+
+        function debugLog(message, data = null) {
+            if (DEBUG_MODE) {
+                console.log(`[DEBUG] ${message}`, data);
+                const debugInfo = document.getElementById('debugInfo');
+                debugInfo.style.display = 'block';
+                debugInfo.innerHTML = `${new Date().toLocaleTimeString()}: ${message}<br>` + debugInfo.innerHTML;
+                if (data) {
+                    debugInfo.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre><br>` + debugInfo.innerHTML;
+                }
+            }
+        }
+
         // Your web app's Firebase configuration
-        var firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyCugrlHaXUICVFJElzdB7jc8it4K6uxia8",
             authDomain: "xed21-application.firebaseapp.com",
             projectId: "xed21-application",
-            storageBucket: "xed21-application.appspot.com",
+            storageBucket: "xed21-application.firebasestorage.app",
             messagingSenderId: "606962635972",
             appId: "1:606962635972:web:4ff09b7fad7e9860c3a591"
         };
+        
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-    </script>
+        
+        // Initialize Firebase services
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-    <script>
+        debugLog('Firebase initialized', { projectId: firebaseConfig.projectId });
+
         // Admin credentials
         const ADMIN_USERNAME = "Hassan66";
         const ADMIN_PASSWORD = "Abutaleb_35";
+        const ADMIN_EMAIL = "admin@xed21.com"; // Admin email for Firebase Auth
 
         let isAdminLoggedIn = false;
         let allContent = [];
 
-        // Check if admin is already logged in (using session storage)
-        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-            showDashboard();
-        }
+        // Check if admin is already logged in
+        auth.onAuthStateChanged((user) => {
+            debugLog('Auth state changed', { user: user ? user.email : null });
+            if (user && user.email === ADMIN_EMAIL) {
+                showDashboard();
+            }
+        });
 
         // Admin login form handler
-        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
+            debugLog('Login attempt', { username });
+            
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                sessionStorage.setItem('adminLoggedIn', 'true');
-                showDashboard();
+                try {
+                    // Try to sign in with email/password
+                    try {
+                        await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+                        debugLog('Email auth successful');
+                    } catch (signInError) {
+                        if (signInError.code === 'auth/user-not-found') {
+                            // Create the admin user if it doesn't exist
+                            debugLog('Creating admin user');
+                            await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+                            debugLog('Admin user created successfully');
+                        } else if (signInError.code === 'auth/wrong-password') {
+                            // Update the password if it's wrong
+                            throw new Error('Invalid credentials');
+                        } else {
+                            throw signInError;
+                        }
+                    }
+                    
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    showDashboard();
+                } catch (error) {
+                    debugLog('Auth error', error);
+                    let errorMessage = 'Authentication error: ';
+                    
+                    switch(error.code) {
+                        case 'auth/admin-restricted-operation':
+                            errorMessage += 'Please enable Email/Password authentication in Firebase Console.';
+                            break;
+                        case 'auth/operation-not-allowed':
+                            errorMessage += 'Email/password sign-in is disabled. Please enable it in Firebase Console.';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage += 'Password is too weak.';
+                            break;
+                        case 'auth/email-already-in-use':
+                            errorMessage += 'Admin account already exists with different credentials.';
+                            break;
+                        default:
+                            errorMessage += error.message;
+                    }
+                    
+                    showError(errorMessage);
+                }
             } else {
                 showError('Invalid username or password');
             }
@@ -621,6 +709,8 @@
         // Load statistics
         async function loadStatistics() {
             try {
+                debugLog('Loading statistics');
+                
                 // Get total topics
                 const topicsSnapshot = await db.collection('content').get();
                 document.getElementById('totalTopics').textContent = topicsSnapshot.size;
@@ -638,8 +728,11 @@
                     }
                 });
                 document.getElementById('activeSubscriptions').textContent = activeCount;
+                
+                debugLog('Statistics loaded', { topics: topicsSnapshot.size, users: usersSnapshot.size });
             } catch (error) {
                 console.error('Error loading statistics:', error);
+                debugLog('Statistics error', error);
             }
         }
 
@@ -648,6 +741,7 @@
             const file = e.target.files[0];
             if (file) {
                 document.getElementById('fileLabel').textContent = `📄 ${file.name}`;
+                debugLog('File selected', { name: file.name, size: file.size, type: file.type });
             }
         });
 
@@ -671,6 +765,7 @@
             if (file && file.type === 'text/html') {
                 document.getElementById('htmlFile').files = e.dataTransfer.files;
                 fileLabel.textContent = `📄 ${file.name}`;
+                debugLog('File dropped', { name: file.name, size: file.size });
             }
         });
 
@@ -688,35 +783,133 @@
             const topicNumber = parseInt(document.getElementById('topicNumber').value);
             const file = document.getElementById('htmlFile').files[0];
             
+            debugLog('Starting upload', { grade, subject, topicName, topicNumber, fileName: file.name });
+            
             try {
+                // Check authentication
+                const currentUser = auth.currentUser;
+                if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+                    debugLog('No authenticated admin user');
+                    throw new Error('Please log in again');
+                }
+                
                 // Show progress
-                animateProgress(0, 50);
+                animateProgress(0, 30);
                 
-                // Upload file to Firebase Storage
-                const fileName = `content/grade${grade}/${subject}/${Date.now()}_${file.name}`;
+                // Create file path
+                const timestamp = Date.now();
+                const fileName = `content/grade${grade}/${subject}/${timestamp}_${file.name}`;
+                debugLog('Uploading to path', fileName);
+                
+                // Create storage reference
                 const storageRef = storage.ref(fileName);
-                const uploadTask = await storageRef.put(file);
                 
-                animateProgress(50, 80);
+                // Upload file with metadata
+                const metadata = {
+                    contentType: 'text/html',
+                    customMetadata: {
+                        grade: grade.toString(),
+                        subject: subject,
+                        topicName: topicName,
+                        topicNumber: topicNumber.toString()
+                    }
+                };
+                
+                animateProgress(30, 60);
+                
+                // Start upload
+                const uploadTask = storageRef.put(file, metadata);
+                
+                // Monitor upload progress
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        animateProgress(60, 60 + (progress * 0.3));
+                        debugLog('Upload progress', { 
+                            progress: progress.toFixed(2) + '%',
+                            bytesTransferred: snapshot.bytesTransferred,
+                            totalBytes: snapshot.totalBytes,
+                            state: snapshot.state
+                        });
+                    },
+                    (error) => {
+                        debugLog('Upload error details', {
+                            code: error.code,
+                            message: error.message,
+                            serverResponse: error.serverResponse,
+                            name: error.name
+                        });
+                        throw error;
+                    },
+                    async () => {
+                        // Upload completed successfully
+                        debugLog('Upload completed, getting download URL');
+                        try {
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            debugLog('Download URL obtained', downloadURL);
+                            
+                            // Continue with the rest of the process
+                            animateProgress(90, 95);
+                            
+                            // Save metadata to Firestore
+                            const docData = {
+                                grade: grade,
+                                subject: subject,
+                                topicName: topicName,
+                                topicNumber: topicNumber,
+                                htmlUrl: downloadURL,
+                                fileName: file.name,
+                                storagePath: fileName,
+                                uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                uploadedBy: 'admin'
+                            };
+                            
+                            await db.collection('content').add(docData);
+                            debugLog('Metadata saved to Firestore');
+                            
+                            animateProgress(95, 100);
+                            
+                            // Reset form
+                            document.getElementById('uploadForm').reset();
+                            document.getElementById('fileLabel').textContent = '📁 Choose HTML file or drag & drop here';
+                            
+                            showSuccess('Topic uploaded successfully!');
+                            loadContent();
+                            loadStatistics();
+                            
+                            setTimeout(() => {
+                                document.getElementById('progressBar').style.width = '0%';
+                            }, 1000);
+                        } catch (completeError) {
+                            debugLog('Error in completion handler', completeError);
+                            throw completeError;
+                        }
+                    }
+                );
+                
+                animateProgress(90, 95);
                 
                 // Get download URL
-                const downloadURL = await uploadTask.ref.getDownloadURL();
-                
-                animateProgress(80, 90);
+                const downloadURL = await uploadSnapshot.ref.getDownloadURL();
+                debugLog('Download URL obtained', downloadURL);
                 
                 // Save metadata to Firestore
-                await db.collection('content').add({
+                const docData = {
                     grade: grade,
                     subject: subject,
                     topicName: topicName,
                     topicNumber: topicNumber,
                     htmlUrl: downloadURL,
                     fileName: file.name,
+                    storagePath: fileName,
                     uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     uploadedBy: 'admin'
-                });
+                };
                 
-                animateProgress(90, 100);
+                await db.collection('content').add(docData);
+                debugLog('Metadata saved to Firestore');
+                
+                animateProgress(95, 100);
                 
                 // Reset form
                 document.getElementById('uploadForm').reset();
@@ -732,7 +925,25 @@
                 
             } catch (error) {
                 console.error('Error uploading:', error);
-                showError('Error uploading topic. Please try again.');
+                debugLog('Upload failed', { 
+                    code: error.code, 
+                    message: error.message,
+                    serverResponse: error.serverResponse 
+                });
+                
+                let errorMessage = 'Error uploading topic: ';
+                if (error.code === 'storage/unauthorized') {
+                    errorMessage += 'Authentication required. Please try logging in again.';
+                } else if (error.code === 'storage/quota-exceeded') {
+                    errorMessage += 'Storage quota exceeded.';
+                } else if (error.code === 'storage/invalid-checksum') {
+                    errorMessage += 'File corrupted during upload. Please try again.';
+                } else {
+                    errorMessage += error.message || 'Unknown error occurred.';
+                }
+                
+                showError(errorMessage);
+                document.getElementById('progressBar').style.width = '0%';
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = 'Upload Topic';
@@ -751,6 +962,8 @@
         // Load content
         async function loadContent() {
             try {
+                debugLog('Loading content');
+                
                 const snapshot = await db.collection('content')
                     .orderBy('grade')
                     .orderBy('subject')
@@ -762,9 +975,11 @@
                     allContent.push({ id: doc.id, ...doc.data() });
                 });
                 
+                debugLog('Content loaded', { count: allContent.length });
                 displayContent(allContent);
             } catch (error) {
                 console.error('Error loading content:', error);
+                debugLog('Load content error', error);
             }
         }
 
@@ -789,7 +1004,7 @@
                         <div class="action-btns">
                             <button class="btn-small btn-view" onclick="viewContent('${item.htmlUrl}')">View</button>
                             <button class="btn-small btn-edit" onclick="editContent('${item.id}')">Edit</button>
-                            <button class="btn-small btn-delete" onclick="deleteContent('${item.id}')">Delete</button>
+                            <button class="btn-small btn-delete" onclick="deleteContent('${item.id}', '${item.storagePath || ''}')">Delete</button>
                         </div>
                     </td>
                 `;
@@ -827,36 +1042,63 @@
         }
 
         // Delete content
-        async function deleteContent(id) {
+        async function deleteContent(id, storagePath) {
             if (!confirm('Are you sure you want to delete this topic?')) {
                 return;
             }
             
             try {
-                // Get the document to find the storage URL
-                const doc = await db.collection('content').doc(id).get();
-                const data = doc.data();
+                debugLog('Deleting content', { id, storagePath });
                 
-                // Delete from Firestore
+                // Delete from Firestore first
                 await db.collection('content').doc(id).delete();
+                debugLog('Deleted from Firestore');
                 
-                // Also delete the file from Storage if needed
-                // You would need to extract the path from the URL
+                // Try to delete from Storage if path exists
+                if (storagePath) {
+                    try {
+                        const storageRef = storage.ref(storagePath);
+                        await storageRef.delete();
+                        debugLog('Deleted from Storage');
+                    } catch (storageError) {
+                        console.warn('Could not delete from storage:', storageError);
+                        debugLog('Storage deletion warning', storageError);
+                    }
+                }
                 
                 showSuccess('Topic deleted successfully!');
                 loadContent();
                 loadStatistics();
             } catch (error) {
                 console.error('Error deleting:', error);
-                showError('Error deleting topic. Please try again.');
+                debugLog('Delete error', error);
+                showError('Error deleting topic: ' + error.message);
             }
         }
 
         // Logout
         function logout() {
             sessionStorage.removeItem('adminLoggedIn');
-            window.location.reload();
+            auth.signOut().then(() => {
+                window.location.reload();
+            });
         }
+
+        // Check Firebase connection on load
+        window.addEventListener('load', () => {
+            debugLog('Page loaded, checking Firebase connection');
+            
+            // Test Firestore connection
+            db.collection('_test').doc('connection').set({
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                debugLog('Firestore connection successful');
+                // Clean up test document
+                db.collection('_test').doc('connection').delete();
+            }).catch(error => {
+                debugLog('Firestore connection failed', error);
+            });
+        });
     </script>
 </body>
 </html>
