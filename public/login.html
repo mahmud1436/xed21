@@ -414,22 +414,44 @@
             document.getElementById('message').style.display = 'none';
         }
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                showMessage('Login successful! Redirecting...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } catch (error) {
-                showMessage(error.message, 'error');
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged((user) => {
+            // Don't auto-redirect if coming from logout
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromLogout = urlParams.has('logout');
+            
+            if (user && !fromLogout) {
+                // User is signed in and not coming from logout
+                window.location.href = 'dashboard.html';
+            } else if (user && fromLogout) {
+                // User still signed in but coming from logout, force signout
+                firebase.auth().signOut().then(() => {
+                    // Clear the URL parameter
+                    window.history.replaceState({}, document.title, 'login.html');
+                });
             }
         });
+
+        // Login form handler
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                try {
+                    // Ensure no persistence for better control
+                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                    // Sign in
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showMessage(error.message, 'error');
+                }
+            });
+        }
 
         // Signup form handler
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -492,14 +514,6 @@
                 showMessage(error.message, 'error');
             }
         }
-
-        // Check if user is already logged in
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in, redirect to dashboard
-                window.location.href = 'dashboard.html';
-            }
-        });
     </script>
 </body>
 </html>

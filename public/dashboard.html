@@ -556,7 +556,18 @@
         let userSubscriptions = [];
 
         // Check authentication
-        auth.onAuthStateChanged(async (user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
+            // Check if this is a logout redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const isLogoutRedirect = urlParams.has('logout');
+            
+            if (isLogoutRedirect && user) {
+                // Force logout if user is still logged in after logout redirect
+                await firebase.auth().signOut();
+                window.location.href = 'login.html';
+                return;
+            }
+            
             if (user) {
                 currentUser = user;
                 document.getElementById('userName').textContent = user.displayName || 'Student';
@@ -848,15 +859,29 @@
                     sessionStorage.clear();
                     localStorage.clear();
                     
-                    // Sign out from Firebase (this invalidates the session across all devices)
-                    await auth.signOut();
+                    // Delete any cached auth data
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                    }
                     
-                    // Redirect to homepage
-                    window.location.href = '/index.html';
+                    // Sign out from Firebase
+                    await firebase.auth().signOut();
+                    
+                    // Set persistence to NONE to ensure no session persistence
+                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+                    
+                    // Small delay to ensure auth state is cleared
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Redirect to homepage with a cache-busting parameter
+                    window.location.href = '/index.html?logout=' + Date.now();
                 } catch (error) {
                     console.error('Logout error:', error);
                     // Even if there's an error, redirect to homepage
-                    window.location.href = '/index.html';
+                    window.location.href = '/index.html?logout=' + Date.now();
                 }
             }
         }

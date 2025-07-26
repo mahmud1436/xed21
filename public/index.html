@@ -379,5 +379,18 @@
     <footer>
         <p>&copy; 2025 XED21. Making learning fun, one game at a time.</p>
     </footer>
+
+    <script>
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('logout')) {
+        // Clear any remaining auth state
+        firebase.auth().signOut().then(() => {
+            // Clean URL
+            window.history.replaceState({}, document.title, '/index.html');
+        });
+    }
+});
+</script>
 </body>
 </html>

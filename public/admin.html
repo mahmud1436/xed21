@@ -1077,11 +1077,38 @@
         }
 
         // Logout
-        function logout() {
-            sessionStorage.removeItem('adminLoggedIn');
-            auth.signOut().then(() => {
-                window.location.reload();
-            });
+        async function logout() {
+            if (confirm('Are you sure you want to logout? You will be logged out from all devices.')) {
+                try {
+                    // Clear all local storage and session storage
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    
+                    // Delete any cached auth data
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                    }
+                    
+                    // Sign out from Firebase
+                    await firebase.auth().signOut();
+                    
+                    // Set persistence to NONE to ensure no session persistence
+                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+                    
+                    // Small delay to ensure auth state is cleared
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Redirect to homepage with a cache-busting parameter
+                    window.location.href = '/index.html?logout=' + Date.now();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    // Even if there's an error, redirect to homepage
+                    window.location.href = '/index.html?logout=' + Date.now();
+                }
+            }
         }
 
         // Check Firebase connection on load
