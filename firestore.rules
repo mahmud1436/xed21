@@ -3,16 +3,28 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Admin access - allow admin to read/write all user data
     match /users/{userId} {
-      allow read, write: if request.auth != null && (
-        request.auth.uid == userId || 
-        request.auth.token.email == "admin@xed21.com"
-      );
+      // Allow users to read/write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow admin to read ALL users (this was missing!)
+      allow read: if request.auth != null && request.auth.token.email == "admin@xed21.com";
+      
+      // Allow admin to write to any user
+      allow write: if request.auth != null && request.auth.token.email == "admin@xed21.com";
     }
     
-    // Anyone can read content (for browsing), but not write
+    // Content access
     match /content/{document=**} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.token.email == "admin@xed21.com";
+    }
+    
+    // Payments collection
+    match /payments/{document=**} {
+      allow read, write: if request.auth != null && (
+        request.auth.uid == resource.data.userId || 
+        request.auth.token.email == "admin@xed21.com"
+      );
     }
   }
 }

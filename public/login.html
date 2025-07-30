@@ -319,15 +319,15 @@
                         if (userData.userType === 'school') {
                             window.location.href = '/school-dashboard.html';
                         } else {
-                            window.location.href = '/dashboard.html';
+                            window.location.href = '/student-dashboard.html';
                         }
                     } else {
                         // User exists in auth but not in Firestore - redirect to student dashboard
-                        window.location.href = '/dashboard.html';
+                        window.location.href = '/student-dashboard.html';
                     }
                 }).catch(error => {
                     console.error("Error checking user type:", error);
-                    window.location.href = '/dashboard.html';
+                    window.location.href = '/student-dashboard.html';
                 });
             } else if (user && fromLogout) {
                 // User still signed in but coming from logout - force signout
@@ -366,7 +366,7 @@
                             if (userData.userType === 'school') {
                                 window.location.href = '/school-dashboard.html';
                             } else {
-                                window.location.href = '/dashboard.html';
+                                window.location.href = '/student-dashboard.html';
                             }
                         }, 1000);
                     } else {
@@ -376,7 +376,7 @@
                             userType: 'student',
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        window.location.href = '/dashboard.html';
+                        window.location.href = '/student-dashboard.html';
                     }
                 } catch (error) {
                     console.error('Login error:', error);
