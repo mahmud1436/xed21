@@ -794,7 +794,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="grade">Grade</label>
-                            <select id="grade" required>
+                            <select id="grade" required onchange="updateContentSubjectDropdowns(this.value)">
                                 <option value="">Select Grade</option>
                                 <option value="1">Grade 1</option>
                                 <option value="2">Grade 2</option>
@@ -854,7 +854,7 @@
                 <h2 class="section-title">Manage Content</h2>
                 
                 <div class="filter-row">
-                    <select id="filterGrade" onchange="filterContent()">
+                    <select id="filterGrade" onchange="filterContent(); updateContentSubjectDropdowns(this.value)">
                         <option value="">All Grades</option>
                         <option value="1">Grade 1</option>
                         <option value="2">Grade 2</option>
@@ -1048,6 +1048,7 @@
             document.getElementById('dashboardSection').style.display = 'block';
             loadStatistics();
             loadContent();
+            updateContentSubjectDropdowns(document.getElementById('grade').value); // Initialize subject dropdowns
         }
 
         // Load statistics
@@ -1488,49 +1489,50 @@
         const tbody = document.getElementById('usersTableBody');
         tbody.innerHTML = '<tr><td colspan="7">Loading users...</td></tr>';
         
-        // Force a fresh read from Firestore (no cache)
-        const usersSnapshot = await db.collection('users')
+        db.collection('users')
             .orderBy('createdAt', 'desc') // Show newest users first
-            .get({ source: 'server' }); // Force server read, not cache
-        
-        allUsers = [];
-        
-        usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            
-            // Handle different field names for consistency
-            const displayName = userData.fullName || userData.name || userData.schoolName || userData.email || 'Unknown';
-            
-            allUsers.push({
-                id: doc.id,
-                ...userData,
-                // Normalize the name field
-                name: displayName,
-                fullName: displayName,
-                // Ensure createdAt is properly formatted
-                createdAt: userData.createdAt ? 
-                    (userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt)) : 
-                    new Date()
+            .onSnapshot((querySnapshot) => {
+                allUsers = [];
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    
+                    // Handle different field names for consistency
+                    const displayName = userData.fullName || userData.name || userData.schoolName || userData.email || 'Unknown';
+                    
+                    allUsers.push({
+                        id: doc.id,
+                        ...userData,
+                        // Normalize the name field
+                        name: displayName,
+                        fullName: displayName,
+                        // Ensure createdAt is properly formatted
+                        createdAt: userData.createdAt ? 
+                            (userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt)) : 
+                            new Date()
+                    });
+                });
+                
+                // Sort by creation date (newest first)
+                allUsers.sort((a, b) => b.createdAt - a.createdAt);
+                
+                filteredUsers = [...allUsers];
+                displayUsers();
+                
+                // Update the total users count
+                document.getElementById('totalUsers').textContent = allUsers.length;
+                
+                console.log(`Loaded ${allUsers.length} users`);
+            }, (error) => {
+                console.error('Error loading users:', error);
+                showError('Error loading users: ' + error.message);
+                
+                // Show error in table
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '<tr><td colspan="7">Error loading users. Please refresh.</td></tr>';
             });
-        });
-        
-        // Sort by creation date (newest first)
-        allUsers.sort((a, b) => b.createdAt - a.createdAt);
-        
-        filteredUsers = [...allUsers];
-        displayUsers();
-        
-        // Update the total users count
-        document.getElementById('totalUsers').textContent = allUsers.length;
-        
-        console.log(`Loaded ${allUsers.length} users`);
     } catch (error) {
-        console.error('Error loading users:', error);
-        showError('Error loading users: ' + error.message);
-        
-        // Show error in table
-        const tbody = document.getElementById('usersTableBody');
-        tbody.innerHTML = '<tr><td colspan="7">Error loading users. Please refresh.</td></tr>';
+        console.error('Error setting up user listener:', error);
+        showError('Error setting up user listener: ' + error.message);
     }
 }
 
@@ -1697,6 +1699,20 @@ function refreshUsers() {
             }
         }
 
+        // Define subjects for each grade globally
+        const gradeSubjects = {
+            '1': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            '2': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            '3': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            '4': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            '5': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            '6': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            '7': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            '8': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            '9': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
+            '10': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science']
+        };
+
         function updateSubjectCheckboxes() {
             const grade = document.getElementById('subscriptionGradeForSubject').value;
             const subjectCheckboxes = document.getElementById('subjectCheckboxes');
@@ -1706,20 +1722,6 @@ function refreshUsers() {
                 subjectCheckboxes.style.display = 'none';
                 return;
             }
-
-            // Define subjects for each grade
-            const gradeSubjects = {
-                '1': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
-                '2': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
-                '3': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
-                '4': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
-                '5': ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
-                '6': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
-                '7': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
-                '8': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
-                '9': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science', 'Physics', 'Chemistry', 'Biology'],
-                '10': ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science', 'Physics', 'Chemistry', 'Biology']
-            };
 
             const subjects = gradeSubjects[grade] || [];
             
@@ -1736,6 +1738,31 @@ function refreshUsers() {
             });
 
             subjectCheckboxes.style.display = 'block';
+        }
+
+        // Function to update subject dropdowns in content management
+        function updateContentSubjectDropdowns(grade) {
+            const uploadSubjectSelect = document.getElementById('subject');
+            const filterSubjectSelect = document.getElementById('filterSubject');
+
+            const subjects = gradeSubjects[grade] || [];
+
+            // Clear existing options
+            uploadSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            filterSubjectSelect.innerHTML = '<option value="">All Subjects</option>';
+
+            // Add new options
+            subjects.forEach(subject => {
+                const option1 = document.createElement('option');
+                option1.value = subject;
+                option1.textContent = subject;
+                uploadSubjectSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = subject;
+                option2.textContent = subject;
+                filterSubjectSelect.appendChild(option2);
+            });
         }
 
         // Handle subscription form submission

@@ -606,27 +606,35 @@
         // Load student data
         async function loadStudentData() {
             try {
-                const doc = await db.collection('users').doc(currentUser.uid).get();
-                if (doc.exists) {
-                    studentData = doc.data();
-                    
-                    // Update UI
-                    document.getElementById('studentName').textContent = studentData.name || currentUser.displayName || 'Student';
-                    currentGrade = studentData.class || 1; // Default to Grade 1 if not set
-                    document.getElementById('studentClass').textContent = `Grade ${currentGrade}`;
-                    
-                    // Check subscriptions
-                    if (studentData.subscriptions && studentData.subscriptions.length > 0) {
-                        const activeSubscriptions = studentData.subscriptions.filter(sub => sub.status === 'active' && new Date(sub.endDate) > new Date());
-                        if (activeSubscriptions.length > 0) {
-                            showActiveSubscriptions(activeSubscriptions);
-                        } else {
-                            showNoSubscription();
+                db.collection('users').doc(currentUser.uid)
+                    .onSnapshot((doc) => {
+                        if (doc.exists) {
+                            studentData = doc.data();
+                            
+                            // Update UI
+                            document.getElementById('studentName').textContent = studentData.name || currentUser.displayName || 'Student';
+                            currentGrade = studentData.class || 1; // Default to Grade 1 if not set
+                            document.getElementById('studentClass').textContent = `Grade ${currentGrade}`;
+                            
+                            // Check subscriptions
+                            if (studentData.subscriptions && studentData.subscriptions.length > 0) {
+                                const activeSubscriptions = studentData.subscriptions.filter(sub => {
+                                    if (sub.status !== 'active') return false;
+                                    if (!sub.endDate) return true; // Lifetime subscription
+                                    const endDate = sub.endDate.toDate ? sub.endDate.toDate() : new Date(sub.endDate);
+                                    return endDate > new Date();
+                                });
+
+                                if (activeSubscriptions.length > 0) {
+                                    showActiveSubscriptions(activeSubscriptions);
+                                } else {
+                                    showNoSubscription();
+                                }
+                            } else {
+                                showNoSubscription();
+                            }
                         }
-                    } else {
-                        showNoSubscription();
-                    }
-                }
+                    });
             } catch (error) {
                 console.error('Error loading student data:', error);
             }
@@ -655,7 +663,7 @@ function showActiveSubscriptions(subscriptions) {
         // Handle different subscription types
         if (sub.type === 'grade') {
             // Grade subscription - add all subjects for that grade
-            const allSubjects = ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'];
+            const allSubjects = subjectsByGrade[sub.grade] || [];
             allSubjects.forEach(subject => {
                 if (!subjectMap.has(subject)) {
                     subjectMap.set(subject, {
@@ -691,7 +699,7 @@ function showActiveSubscriptions(subscriptions) {
                 });
             } else if (sub.subjects === 'all') {
                 // All subjects subscription
-                const allSubjects = ['Mathematics', 'Science', 'English', 'Social Studies', 'Hindi'];
+                const allSubjects = subjectsByGrade[sub.grade] || [];
                 allSubjects.forEach(subject => {
                     if (!subjectMap.has(subject)) {
                         subjectMap.set(subject, {
@@ -709,11 +717,11 @@ function showActiveSubscriptions(subscriptions) {
     // Display each unique subject
     subjectMap.forEach((subData, subject) => {
         const subjectCard = document.createElement('div');
-        subjectCard.className = 'subject-card';
+        subjectCard.className = 'subscription-card';
         subjectCard.onclick = () => loadTopics(subject, subData.grade);
         
         const icon = subjectIcons[subject] || '';
-        const expiryDate = subData.endDate ? new Date(subData.endDate).toLocaleDateString() : 'Lifetime';
+        const expiryDate = subData.endDate ? (subData.endDate.toDate ? subData.endDate.toDate().toLocaleDateString() : new Date(subData.endDate).toLocaleDateString()) : 'Lifetime';
         
         subjectCard.innerHTML = `
             <div class="subject-icon">${icon}</div>
