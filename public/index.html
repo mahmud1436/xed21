@@ -384,11 +384,19 @@
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('logout')) {
-        // Clear any remaining auth state
-        firebase.auth().signOut().then(() => {
-            // Clean URL
+        // Clear any remaining auth state and clean URL
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().signOut().then(() => {
+                // Clean URL
+                window.history.replaceState({}, document.title, '/index.html');
+            }).catch(() => {
+                // Clean URL even if Firebase is not available
+                window.history.replaceState({}, document.title, '/index.html');
+            });
+        } else {
+            // Clean URL if Firebase is not loaded
             window.history.replaceState({}, document.title, '/index.html');
-        });
+        }
     }
 });
 </script>

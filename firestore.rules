@@ -1,21 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow users to read/write their own data
+    // Admin access - allow admin to read/write all user data
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && (
+        request.auth.uid == userId || 
+        request.auth.token.email == "admin@xed21.com"
+      );
     }
     
     // Anyone can read content (for browsing), but not write
     match /content/{document=**} {
       allow read: if true;
-      allow write: if false;
-    }
-    
-    // Temporary: Allow all authenticated users to write (for testing)
-    // Remove this in production
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == "admin@xed21.com";
     }
   }
 }

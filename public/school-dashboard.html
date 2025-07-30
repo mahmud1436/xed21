@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Dashboard - XED21</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .school-info {
+            text-align: right;
+        }
+
+        .school-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .school-reg {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .logout-btn {
+            background: var(--gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* No Subscription State */
+        .no-subscription {
+            background: var(--white);
+            padding: 4rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
+        }
+
+        .no-subscription h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .no-subscription p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .add-subjects-btn {
+            background: var(--gradient);
+            color: white;
+            padding: 1.25rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .add-subjects-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Active Subscriptions */
+        .subscriptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .subscription-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .subscription-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .grade-badge {
+            background: var(--gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .subjects-list {
+            margin-bottom: 1rem;
+        }
+
+        .subjects-list h4 {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .subject-tag {
+            display: inline-block;
+            background: var(--bg-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 0.25rem;
+            color: var(--text-dark);
+        }
+
+        .subscription-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .expire-date {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Subscription Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.5rem;
+        }
+
+        /* Grade Selection */
+        .grade-selection {
+            margin-bottom: 2rem;
+        }
+
+        .grade-selection h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .grades-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .grade-option {
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .grade-option:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .grade-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Subject Selection */
+        .subject-selection {
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .subject-option {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .subject-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .subject-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .select-all-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-light);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .select-all-btn:hover,
+        .select-all-btn.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Pricing Plans */
+        .pricing-section {
+            display: none;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card {
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.selected {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .pricing-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-info {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--gradient);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .summary {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .proceed-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .proceed-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .proceed-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .grades-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .subject-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🏫 School Dashboard</h1>
+        <div class="school-info">
+            <div class="school-name" id="schoolName">Demo School</div>
+            <div class="school-reg" id="schoolReg">Reg: DEMO123</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- No Subscription State -->
+        <div class="no-subscription" id="noSubscription">
+            <h2>Welcome to XED21 Educational Platform</h2>
+            <p>Start transforming education with our interactive gamified content</p>
+            <button class="add-subjects-btn" onclick="openSubscriptionModal()">
+                Add Your Subjects and Classes
+            </button>
+        </div>
+
+        <!-- Active Subscriptions -->
+        <div id="activeSubscriptions" style="display: none;">
+            <h2 style="margin-bottom: 1rem;">Active Subscriptions</h2>
+            <button class="add-subjects-btn" style="margin-bottom: 2rem;" onclick="openSubscriptionModal()">
+                Add More Subjects
+            </button>
+            <div class="subscriptions-grid" id="subscriptionsGrid">
+                <!-- Subscriptions will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal" id="subscriptionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Grades and Subjects</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+
+            <!-- Step 1: Grade Selection -->
+            <div class="grade-selection" id="gradeSelection">
+                <h3>Step 1: Select Grades</h3>
+                <div class="grades-grid">
+                    <div class="grade-option" data-grade="1" onclick="toggleGrade(1)">Grade 1</div>
+                    <div class="grade-option" data-grade="2" onclick="toggleGrade(2)">Grade 2</div>
+                    <div class="grade-option" data-grade="3" onclick="toggleGrade(3)">Grade 3</div>
+                    <div class="grade-option" data-grade="4" onclick="toggleGrade(4)">Grade 4</div>
+                    <div class="grade-option" data-grade="5" onclick="toggleGrade(5)">Grade 5</div>
+                    <div class="grade-option" data-grade="6" onclick="toggleGrade(6)">Grade 6</div>
+                    <div class="grade-option" data-grade="7" onclick="toggleGrade(7)">Grade 7</div>
+                    <div class="grade-option" data-grade="8" onclick="toggleGrade(8)">Grade 8</div>
+                    <div class="grade-option" data-grade="9" onclick="toggleGrade(9)">Grade 9</div>
+                    <div class="grade-option" data-grade="10" onclick="toggleGrade(10)">Grade 10</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Subject Selection -->
+            <div class="subject-selection" id="subjectSelection">
+                <h3>Step 2: Select Subjects or Entire Grade</h3>
+                <div id="subjectContent">
+                    <!-- Dynamic content based on grade selection -->
+                </div>
+            </div>
+
+            <!-- Step 3: Pricing -->
+            <div class="pricing-section" id="pricingSection">
+                <h3>Step 3: Select Subscription Plan</h3>
+                <div class="summary" id="selectionSummary">
+                    <!-- Summary will be shown here -->
+                </div>
+                <div class="pricing-cards" id="pricingCards">
+                    <!-- Pricing options will be shown here -->
+                </div>
+                <button class="proceed-btn" id="proceedBtn" disabled onclick="processPayment()">
+                    Select a plan to continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let schoolData = null;
+        let selectedGrades = [];
+        let selectedSubjects = {};
+        let selectedPlan = null;
+
+        // Razorpay configuration
+        const RAZORPAY_KEY_ID = "rzp_test_7PYFpXg7VGBYwK";
+
+        // Subject mapping by grade
+        const subjectsByGrade = {
+            1: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            2: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            3: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            4: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            5: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            6: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            7: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            8: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            9: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
+            10: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science']
+        };
+
+        // Open subscription modal
+        function openSubscriptionModal() {
+            document.getElementById('subscriptionModal').style.display = 'flex';
+            resetModal();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('subscriptionModal').style.display = 'none';
+            resetModal();
+        }
+
+        // Reset modal state
+        function resetModal() {
+            selectedGrades = [];
+            selectedSubjects = {};
+            selectedPlan = null;
+            
+            document.querySelectorAll('.grade-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById('subjectSelection').style.display = 'none';
+            document.getElementById('pricingSection').style.display = 'none';
+        }
+
+        // Toggle grade selection
+        function toggleGrade(grade) {
+            const gradeEl = document.querySelector(`[data-grade="${grade}"]`);
+            
+            if (selectedGrades.includes(grade)) {
+                selectedGrades = selectedGrades.filter(g => g !== grade);
+                gradeEl.classList.remove('selected');
+                delete selectedSubjects[grade];
+            } else {
+                selectedGrades.push(grade);
+                gradeEl.classList.add('selected');
+            }
+            
+            updateSubjectSelection();
+        }
+
+        // Update subject selection UI
+        function updateSubjectSelection() {
+            if (selectedGrades.length === 0) {
+                document.getElementById('subjectSelection').style.display = 'none';
+                document.getElementById('pricingSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('subjectSelection').style.display = 'block';
+            const content = document.getElementById('subjectContent');
+            content.innerHTML = '';
+            
+            selectedGrades.forEach(grade => {
+                const gradeDiv = document.createElement('div');
+                gradeDiv.innerHTML = `
+                    <h4 style="margin: 1rem 0;">Grade ${grade}</h4>
+                    <button class="select-all-btn" onclick="selectAllSubjects(${grade})" id="selectAll${grade}">
+                        Select Entire Grade ${grade}
+                    </button>
+                    <div class="subject-grid" id="subjects${grade}">
+                        ${subjectsByGrade[grade].map(subject => `
+                            <div class="subject-option" data-grade="${grade}" data-subject="${subject}" 
+                                 onclick="toggleSubject(${grade}, '${subject}')">
+                                ${subject}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                content.appendChild(gradeDiv);
+                
+                // Restore selections if any
+                if (selectedSubjects[grade]) {
+                    if (selectedSubjects[grade] === 'all') {
+                        document.getElementById(`selectAll${grade}`).classList.add('selected');
+                    } else {
+                        selectedSubjects[grade].forEach(subject => {
+                            const el = document.querySelector(`[data-grade="${grade}"][data-subject="${subject}"]`);
+                            if (el) el.classList.add('selected');
+                        });
+                    }
+                }
+            });
+            
+            updatePricing();
+        }
+
+        // Select all subjects for a grade
+        function selectAllSubjects(grade) {
+            const btn = document.getElementById(`selectAll${grade}`);
+            const subjectElements = document.querySelectorAll(`#subjects${grade} .subject-option`);
+            
+            if (selectedSubjects[grade] === 'all') {
+                // Deselect all
+                delete selectedSubjects[grade];
+                btn.classList.remove('selected');
+                subjectElements.forEach(el => el.classList.remove('selected'));
+            } else {
+                // Select all
+                selectedSubjects[grade] = 'all';
+                btn.classList.add('selected');
+                subjectElements.forEach(el => el.classList.remove('selected'));
+            }
+            
+            updatePricing();
+        }
+
+        // Toggle individual subject
+        function toggleSubject(grade, subject) {
+            if (selectedSubjects[grade] === 'all') {
+                // If entire grade is selected, switch to individual subjects
+                selectedSubjects[grade] = [subject];
+                document.getElementById(`selectAll${grade}`).classList.remove('selected');
+            } else if (!selectedSubjects[grade]) {
+                selectedSubjects[grade] = [subject];
+            } else {
+                const index = selectedSubjects[grade].indexOf(subject);
+                if (index > -1) {
+                    selectedSubjects[grade].splice(index, 1);
+                    if (selectedSubjects[grade].length === 0) {
+                        delete selectedSubjects[grade];
+                    }
+                } else {
+                    selectedSubjects[grade].push(subject);
+                }
+            }
+            
+            // Update UI
+            const subjectEl = document.querySelector(`[data-grade="${grade}"][data-subject="${subject}"]`);
+            if (subjectEl) subjectEl.classList.toggle('selected');
+            
+            updatePricing();
+        }
+
+        // Update pricing based on selections
+        function updatePricing() {
+            const hasSelections = Object.keys(selectedSubjects).length > 0;
+            
+            if (!hasSelections) {
+                document.getElementById('pricingSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('pricingSection').style.display = 'block';
+            
+            // Calculate pricing
+            let entireGrades = 0;
+            let individualSubjects = 0;
+            
+            Object.entries(selectedSubjects).forEach(([grade, subjects]) => {
+                if (subjects === 'all') {
+                    entireGrades++;
+                } else {
+                    individualSubjects += subjects.length;
+                }
+            });
+            
+            // Update summary
+            const summaryEl = document.getElementById('selectionSummary');
+            summaryEl.innerHTML = `
+                <h4>Your Selection:</h4>
+                ${entireGrades > 0 ? `<p>• ${entireGrades} Entire Grade${entireGrades > 1 ? 's' : ''}</p>` : ''}
+                ${individualSubjects > 0 ? `<p>• ${individualSubjects} Individual Subject${individualSubjects > 1 ? 's' : ''}</p>` : ''}
+            `;
+            
+            // Calculate prices
+            let monthlyPrice, sixMonthPrice, yearlyPrice;
+            
+            if (entireGrades > 0 && individualSubjects === 0) {
+                // Only entire grades selected
+                monthlyPrice = entireGrades * 1500;
+                sixMonthPrice = entireGrades * 8000;
+                yearlyPrice = entireGrades * 15000;
+            } else if (entireGrades === 0 && individualSubjects > 0) {
+                // Only individual subjects - no monthly option
+                monthlyPrice = null;
+                sixMonthPrice = individualSubjects * 1500;
+                yearlyPrice = individualSubjects * 2500;
+            } else {
+                // Mixed selection - calculate separately
+                monthlyPrice = entireGrades * 1500; // Only for grades
+                sixMonthPrice = (entireGrades * 8000) + (individualSubjects * 1500);
+                yearlyPrice = (entireGrades * 15000) + (individualSubjects * 2500);
+            }
+            
+            // Update pricing cards
+            const pricingCards = document.getElementById('pricingCards');
+            pricingCards.innerHTML = '';
+            
+            if (monthlyPrice !== null) {
+                pricingCards.innerHTML += `
+                    <div class="pricing-card" onclick="selectPlan('monthly', ${monthlyPrice})">
+                        <h4>Monthly</h4>
+                        <div class="price">₹${monthlyPrice.toLocaleString()}</div>
+                        <div class="price-info">Billed monthly</div>
+                        ${entireGrades > 0 && individualSubjects > 0 ? '<small>*Monthly only for entire grades</small>' : ''}
+                    </div>
+                `;
+            }
+            
+            pricingCards.innerHTML += `
+                <div class="pricing-card" onclick="selectPlan('6months', ${sixMonthPrice})">
+                    <div class="popular-badge">SAVE 33%</div>
+                    <h4>6 Months</h4>
+                    <div class="price">₹${sixMonthPrice.toLocaleString()}</div>
+                    <div class="price-info">₹${Math.round(sixMonthPrice/6).toLocaleString()}/month</div>
+                </div>
+                
+                <div class="pricing-card" onclick="selectPlan('yearly', ${yearlyPrice})">
+                    <h4>12 Months</h4>
+                    <div class="price">₹${yearlyPrice.toLocaleString()}</div>
+                    <div class="price-info">₹${Math.round(yearlyPrice/12).toLocaleString()}/month</div>
+                    <small style="color: var(--success);">Best Value!</small>
+                </div>
+            `;
+        }
+
+        // Select plan
+        function selectPlan(type, price) {
+            selectedPlan = { type, price };
+            
+            // Update UI
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.pricing-card').classList.add('selected');
+            
+            // Enable proceed button
+            const proceedBtn = document.getElementById('proceedBtn');
+            proceedBtn.disabled = false;
+            proceedBtn.textContent = `Pay ₹${price.toLocaleString()}`;
+        }
+
+        // Process payment with Razorpay
+        async function processPayment() {
+            if (!selectedPlan) {
+                alert('Please select a plan');
+                return;
+            }
+
+            // Demo mode - show selection details
+            alert(`🎉 Demo Mode Payment\n\nSelected: ${Object.keys(selectedSubjects).length} grade(s)\nPlan: ${selectedPlan.type}\nAmount: ₹${selectedPlan.price.toLocaleString()}\n\nIn production, this would process payment via Razorpay.`);
+            
+            // Reset for demo
+            closeModal();
+        }
+
+        // Logout
+        async function logout() {
+            if (confirm('Are you sure you want to logout? You will be logged out from all devices.')) {
+                try {
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    await auth.signOut();
+                    window.location.href = '/index.html?logout=' + Date.now();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/index.html?logout=' + Date.now();
+                }
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('subscriptionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('School Dashboard loaded successfully');
+        });
+    </script>
+</body>
+</html>

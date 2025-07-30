@@ -1,5 +1,18 @@
 node_modules/
-.firebase/
+# Firebase
+.firebase
+
+# Firebase Emulators
+.firebase/emulators
+
+# Firebase Hosting
+.firebase/hosting
+
+# Firebase Functions
+functions/node_modules
+
+# Config file
+public/js/config.js/
 *.log
 .DS_Store
 .env

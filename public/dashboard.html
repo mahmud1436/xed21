@@ -30,96 +30,37 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100vh;
-            background: var(--white);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: transform 0.3s;
-        }
-
-        .sidebar-header {
-            padding: 2rem;
-            background: var(--gradient);
-            color: white;
-        }
-
-        .sidebar-header h2 {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .user-info {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .user-info h3 {
-            font-size: 1.1rem;
-            color: var(--text-dark);
-            margin-bottom: 0.25rem;
-        }
-
-        .user-info p {
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
-
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-item {
-            display: block;
-            padding: 1rem 1.5rem;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: background 0.3s;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-light);
-            color: var(--primary-color);
-        }
-
-        .nav-item.active {
-            background: var(--bg-light);
-            color: var(--primary-color);
-            border-left: 3px solid var(--primary-color);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
+        /* Header */
         .header {
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .header h1 {
             font-size: 1.75rem;
             color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .student-info {
+            text-align: right;
+        }
+
+        .student-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .student-class {
+            font-size: 0.875rem;
+            color: var(--text-light);
         }
 
         .logout-btn {
@@ -130,70 +71,317 @@
             border-radius: 8px;
             cursor: pointer;
             transition: transform 0.3s;
+            margin-top: 0.5rem;
         }
 
         .logout-btn:hover {
             transform: translateY(-2px);
         }
 
-        /* Grade Grid */
-        .grades-section {
-            margin-bottom: 3rem;
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        .section-title {
-            font-size: 1.5rem;
-            color: var(--text-dark);
-            margin-bottom: 1.5rem;
-        }
-
-        .grades-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-
-        .grade-card {
+        /* No Subscription State */
+        .no-subscription {
             background: var(--white);
-            padding: 2rem 1rem;
-            border-radius: 12px;
+            padding: 4rem;
+            border-radius: 16px;
             text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
         }
 
-        .grade-card:hover {
+        .no-subscription h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .no-subscription p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .add-subjects-btn {
+            background: var(--gradient);
+            color: white;
+            padding: 1.25rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .add-subjects-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Active Subscriptions */
+        .subscriptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .subscription-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .subscription-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .grade-card h3 {
+        .subject-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .subscription-card h3 {
             font-size: 1.25rem;
             color: var(--text-dark);
             margin-bottom: 0.5rem;
         }
 
-        .grade-card p {
+        .subscription-card p {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .subscription-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .expire-date {
             font-size: 0.875rem;
             color: var(--text-light);
         }
 
-        .locked {
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Subscription Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.5rem;
+        }
+
+        /* Subject Selection */
+        .subject-selection {
+            margin-bottom: 2rem;
+        }
+
+        .subject-selection h3 {
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .subject-option {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .subject-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .subject-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .select-all-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-light);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .select-all-btn:hover,
+        .select-all-btn.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Pricing Plans */
+        .pricing-section {
+            display: none;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card {
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.selected {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .pricing-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-info {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--gradient);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .summary {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .proceed-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .proceed-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .proceed-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
 
-        .locked::after {
-            content: '🔒';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5rem;
-        }
-
-        /* Subjects View */
-        .subjects-view {
+        /* Topics View */
+        .topics-view {
             display: none;
         }
 
@@ -207,63 +395,6 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .subjects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .subject-card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .subject-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .subject-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .subject-card h3 {
-            font-size: 1.25rem;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .subject-card p {
-            font-size: 0.875rem;
-            color: var(--text-light);
-            margin-bottom: 1rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--gradient);
-            transition: width 0.3s;
-        }
-
-        /* Topics View */
-        .topics-view {
-            display: none;
         }
 
         .topics-grid {
@@ -313,220 +444,88 @@
             color: var(--text-light);
         }
 
-        /* Subscription Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-            color: var(--text-dark);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-light);
-        }
-
-        .pricing-options {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .pricing-option {
-            border: 2px solid #e5e7eb;
-            padding: 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .pricing-option:hover,
-        .pricing-option.selected {
-            border-color: var(--primary-color);
-            background: var(--bg-light);
-        }
-
-        .pricing-option h3 {
-            font-size: 1.1rem;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .pricing-option .price {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .subscribe-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--gradient);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .subscribe-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Mobile Menu Toggle */
-        .menu-toggle {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background: var(--white);
-            border: none;
-            padding: 0.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .pricing-cards {
+                grid-template-columns: 1fr;
             }
-
-            .sidebar.active {
-                transform: translateX(0);
+            
+            .subject-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .grades-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-        }
-
-        /* Loading State */
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-light);
-        }
-
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2>XED21</h2>
-        </div>
-        <div class="user-info">
-            <h3 id="userName">Loading...</h3>
-            <p id="userEmail">...</p>
-        </div>
-        <nav class="sidebar-nav">
-            <button class="nav-item active" onclick="showGrades()">📚 All Grades</button>
-            <button class="nav-item" onclick="showMySubjects()">📖 My Subjects</button>
-            <button class="nav-item" onclick="showProgress()">📊 Progress</button>
-            <button class="nav-item" onclick="showSettings()">⚙️ Settings</button>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="header">
-            <h1>Choose Your Grade</h1>
+    <!-- Header -->
+    <header class="header">
+        <h1>🎓 Student Dashboard</h1>
+        <div class="student-info">
+            <div class="student-name" id="studentName">Loading...</div>
+            <div class="student-class" id="studentClass">Grade ...</div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
+    </header>
 
-        <!-- Grades Grid -->
-        <section class="grades-section" id="gradesView">
-            <p class="section-title">Select a grade to explore subjects</p>
-            <div class="grades-grid" id="gradesGrid">
-                <!-- Grades will be loaded here -->
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Active Subscriptions -->
+        <div id="activeSubscriptions" style="display: none;">
+            <h2 style="margin-bottom: 1rem;">My Subjects</h2>
+            <div class="subscriptions-grid" id="subscriptionsGrid">
+                <!-- Subscriptions will be loaded here -->
             </div>
-        </section>
-
-        <!-- Subjects View -->
-        <section class="subjects-view" id="subjectsView">
-            <button class="back-btn" onclick="showGrades()">← Back to Grades</button>
-            <h2 class="section-title" id="gradeTitle">Grade X Subjects</h2>
-            <div class="subjects-grid" id="subjectsGrid">
-                <!-- Subjects will be loaded here -->
-            </div>
-        </section>
+        </div>
 
         <!-- Topics View -->
-        <section class="topics-view" id="topicsView">
-            <button class="back-btn" onclick="backToSubjects()">← Back to Subjects</button>
-            <h2 class="section-title" id="subjectTitle">Subject Topics</h2>
+        <div class="topics-view" id="topicsView">
+            <button class="back-btn" onclick="backToSubjects()">← Back to My Subjects</button>
+            <h2 id="topicTitle" style="margin-bottom: 2rem;">Subject Topics</h2>
             <div class="topics-grid" id="topicsGrid">
                 <!-- Topics will be loaded here -->
             </div>
-        </section>
-    </main>
+        </div>
+
+        <!-- No Subscription State -->
+        <div class="no-subscription" id="noSubscription">
+            <h2>Welcome to XED21 Learning Platform!</h2>
+            <p>Start your exciting learning journey with interactive gamified content</p>
+            <button class="add-subjects-btn" onclick="openSubscriptionModal()">
+                🎮 Add Your Subjects to Start Exploring and Have Fun!
+            </button>
+        </div>
+    </div>
 
     <!-- Subscription Modal -->
     <div class="modal" id="subscriptionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Subscribe to Unlock</h2>
+                <h2>Select Subjects and Plan</h2>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
-            <div id="modalBody">
-                <!-- Dynamic content will be loaded here -->
+
+            <!-- Step 1: Subject Selection -->
+            <div class="subject-selection" id="subjectSelection">
+                <h3 id="gradeHeading">Select Subjects for Grade X</h3>
+                <button class="select-all-btn" onclick="selectAllSubjects()" id="selectAllBtn">
+                    Select All Subjects
+                </button>
+                <div class="subject-grid" id="subjectGrid">
+                    <!-- Subjects will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Step 2: Pricing -->
+            <div class="pricing-section" id="pricingSection">
+                <h3>Select Subscription Plan</h3>
+                <div class="summary" id="selectionSummary">
+                    <!-- Summary will be shown here -->
+                </div>
+                <div class="pricing-cards" id="pricingCards">
+                    <!-- Pricing options will be shown here -->
+                </div>
+                <button class="proceed-btn" id="proceedBtn" disabled onclick="processPayment()">
+                    Select a plan to continue
+                </button>
             </div>
         </div>
     </div>
@@ -535,11 +534,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
+        // Firebase configuration
+        const firebaseConfig = {
             apiKey: "AIzaSyCugrlHaXUICVFJElzdB7jc8it4K6uxia8",
             authDomain: "xed21-application.firebaseapp.com",
             projectId: "xed21-application",
@@ -547,167 +548,179 @@
             messagingSenderId: "606962635972",
             appId: "1:606962635972:web:4ff09b7fad7e9860c3a591"
         };
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Razorpay configuration
+        const RAZORPAY_KEY_ID = "rzp_test_7PYFpXg7VGBYwK";
 
         let currentUser = null;
+        let studentData = null;
         let currentGrade = null;
+        let selectedSubjects = [];
+        let selectedPlan = null;
+        let isAllSubjectsSelected = false;
         let currentSubject = null;
-        let userSubscriptions = [];
+
+        // Subject mapping by grade
+        const subjectsByGrade = {
+            1: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            2: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            3: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            4: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            5: ['Mathematics', 'English', 'Hindi', 'Environmental Studies'],
+            6: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            7: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            8: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science'],
+            9: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science'],
+            10: ['Mathematics', 'Science', 'English', 'Hindi', 'Social Science', 'Computer Science']
+        };
+
+        // Subject icons mapping
+        const subjectIcons = {
+            'Mathematics': '🔢',
+            'Science': '🔬',
+            'English': '📝',
+            'Hindi': '🇮🇳',
+            'Social Science': '🌍',
+            'Computer Science': '💻',
+            'Physics': '⚡',
+            'Chemistry': '🧪',
+            'Biology': '🌿',
+            'Environmental Studies': '🌱'
+        };
 
         // Check authentication
-        firebase.auth().onAuthStateChanged(async (user) => {
-            // Check if this is a logout redirect
-            const urlParams = new URLSearchParams(window.location.search);
-            const isLogoutRedirect = urlParams.has('logout');
-            
-            if (isLogoutRedirect && user) {
-                // Force logout if user is still logged in after logout redirect
-                await firebase.auth().signOut();
-                window.location.href = 'login.html';
-                return;
-            }
-            
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('userName').textContent = user.displayName || 'Student';
-                document.getElementById('userEmail').textContent = user.email;
-                
-                // Load user data
-                await loadUserData();
-                loadGrades();
+                await loadStudentData();
             } else {
-                // Not logged in, redirect to login
-                window.location.href = 'login.html';
+                window.location.href = '/login.html';
             }
         });
 
-        // Load user data including subscriptions
-        async function loadUserData() {
+        // Load student data
+        async function loadStudentData() {
             try {
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    userSubscriptions = userData.subscriptions || [];
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    studentData = doc.data();
+                    
+                    // Update UI
+                    document.getElementById('studentName').textContent = studentData.name || currentUser.displayName || 'Student';
+                    currentGrade = studentData.class || 1; // Default to Grade 1 if not set
+                    document.getElementById('studentClass').textContent = `Grade ${currentGrade}`;
+                    
+                    // Check subscriptions
+                    if (studentData.subscriptions && studentData.subscriptions.length > 0) {
+                        const activeSubscriptions = studentData.subscriptions.filter(sub => sub.status === 'active' && new Date(sub.endDate) > new Date());
+                        if (activeSubscriptions.length > 0) {
+                            showActiveSubscriptions(activeSubscriptions);
+                        } else {
+                            showNoSubscription();
+                        }
+                    } else {
+                        showNoSubscription();
+                    }
                 }
             } catch (error) {
-                console.error('Error loading user data:', error);
+                console.error('Error loading student data:', error);
             }
         }
 
-        // Load grades
-        function loadGrades() {
-            const gradesGrid = document.getElementById('gradesGrid');
-            gradesGrid.innerHTML = '';
+        // Show no subscription state
+        function showNoSubscription() {
+            document.getElementById('noSubscription').style.display = 'block';
+            document.getElementById('activeSubscriptions').style.display = 'none';
+            document.getElementById('topicsView').style.display = 'none';
+        }
 
-            for (let i = 1; i <= 10; i++) {
-                const gradeCard = document.createElement('div');
-                gradeCard.className = 'grade-card';
-                gradeCard.innerHTML = `
-                    <h3>Grade ${i}</h3>
-                    <p>NCERT Curriculum</p>
+        // Show active subscriptions
+        function showActiveSubscriptions(subscriptions) {
+            document.getElementById('noSubscription').style.display = 'none';
+            document.getElementById('activeSubscriptions').style.display = 'block';
+            document.getElementById('topicsView').style.display = 'none';
+            
+            const grid = document.getElementById('subscriptionsGrid');
+            grid.innerHTML = '';
+            
+            // Get all subscribed subjects
+            const subscribedSubjects = new Set();
+            
+            subscriptions.forEach(sub => {
+                if (sub.grade == currentGrade) {
+                    if (sub.type === 'grade') {
+                        subjectsByGrade[currentGrade].forEach(s => subscribedSubjects.add(s));
+                    } else if (sub.type === 'subject') {
+                        subscribedSubjects.add(sub.subject);
+                    }
+                }
+            });
+            
+            // Display each subscribed subject as a card
+            subscribedSubjects.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = 'subscription-card';
+                card.onclick = () => showTopics(subject);
+                
+                card.innerHTML = `
+                    <div class="subject-icon">${subjectIcons[subject] || '📚'}</div>
+                    <h3>${subject}</h3>
+                    <p>Click to explore topics</p>
+                    <div class="subscription-meta">
+                        <span class="expire-date">Access Available</span>
+                        <span class="status-badge status-active">Active</span>
+                    </div>
                 `;
-                gradeCard.onclick = () => showSubjects(i);
-                gradesGrid.appendChild(gradeCard);
-            }
-        }
-
-        // Show subjects for a grade
-        async function showSubjects(grade) {
-            currentGrade = grade;
-            document.getElementById('gradesView').style.display = 'none';
-            document.getElementById('subjectsView').style.display = 'block';
-            document.getElementById('gradeTitle').textContent = `Grade ${grade} Subjects`;
-
-            const subjectsGrid = document.getElementById('subjectsGrid');
-            subjectsGrid.innerHTML = '<div class="loading">Loading subjects</div>';
-
-            try {
-                // Get subjects for this grade
-                const subjectsSnapshot = await db.collection('content')
-                    .where('grade', '==', grade)
-                    .get();
-
-                const subjects = new Set();
-                subjectsSnapshot.forEach(doc => {
-                    subjects.add(doc.data().subject);
-                });
-
-                subjectsGrid.innerHTML = '';
-
-                // Subject icons mapping
-                const subjectIcons = {
-                    'Mathematics': '🔢',
-                    'Science': '🔬',
-                    'English': '📝',
-                    'Hindi': '🇮🇳',
-                    'Social Science': '🌍',
-                    'Computer Science': '💻',
-                    'Physics': '⚡',
-                    'Chemistry': '🧪',
-                    'Biology': '🌿'
-                };
-
-                subjects.forEach(subject => {
-                    const isSubscribed = checkSubscription(grade, subject);
-                    const subjectCard = document.createElement('div');
-                    subjectCard.className = `subject-card ${!isSubscribed ? 'locked' : ''}`;
-                    subjectCard.innerHTML = `
-                        <div class="subject-icon">${subjectIcons[subject] || '📚'}</div>
-                        <h3>${subject}</h3>
-                        <p>${isSubscribed ? 'Click to explore topics' : 'Subscribe to unlock'}</p>
-                        ${isSubscribed ? '<div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>' : ''}
-                    `;
-                    subjectCard.onclick = () => isSubscribed ? showTopics(subject) : showSubscriptionModal(grade, subject);
-                    subjectsGrid.appendChild(subjectCard);
-                });
-
-                if (subjects.size === 0) {
-                    subjectsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light);">No subjects available yet.</p>';
-                }
-            } catch (error) {
-                console.error('Error loading subjects:', error);
-                subjectsGrid.innerHTML = '<p style="text-align: center; color: var(--error);">Error loading subjects. Please try again.</p>';
-            }
+                
+                grid.appendChild(card);
+            });
         }
 
         // Show topics for a subject
         async function showTopics(subject) {
             currentSubject = subject;
-            document.getElementById('subjectsView').style.display = 'none';
+            document.getElementById('activeSubscriptions').style.display = 'none';
             document.getElementById('topicsView').style.display = 'block';
-            document.getElementById('subjectTitle').textContent = `${subject} - Grade ${currentGrade}`;
-
+            document.getElementById('topicTitle').textContent = `${subject} - Grade ${currentGrade}`;
+            
             const topicsGrid = document.getElementById('topicsGrid');
-            topicsGrid.innerHTML = '<div class="loading">Loading topics</div>';
-
+            topicsGrid.innerHTML = '<p style="text-align: center;">Loading topics...</p>';
+            
             try {
-                const topicsSnapshot = await db.collection('content')
+                const snapshot = await db.collection('content')
                     .where('grade', '==', currentGrade)
                     .where('subject', '==', subject)
                     .orderBy('topicNumber')
                     .get();
-
+                
                 topicsGrid.innerHTML = '';
-
-                topicsSnapshot.forEach((doc, index) => {
+                
+                if (snapshot.empty) {
+                    topicsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light);">No topics available yet.</p>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
                     const topic = doc.data();
-                    const topicCard = document.createElement('div');
-                    topicCard.className = 'topic-card';
-                    topicCard.innerHTML = `
-                        <div class="topic-number">${index + 1}</div>
+                    const card = document.createElement('div');
+                    card.className = 'topic-card';
+                    card.onclick = () => openTopic(topic.htmlUrl);
+                    
+                    card.innerHTML = `
+                        <div class="topic-number">${topic.topicNumber}</div>
                         <div class="topic-info">
                             <h4>${topic.topicName}</h4>
                             <p>Click to start learning</p>
                         </div>
                     `;
-                    topicCard.onclick = () => openTopic(topic.htmlUrl);
-                    topicsGrid.appendChild(topicCard);
+                    
+                    topicsGrid.appendChild(card);
                 });
-
-                if (topicsSnapshot.empty) {
-                    topicsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light);">No topics available yet.</p>';
-                }
             } catch (error) {
                 console.error('Error loading topics:', error);
                 topicsGrid.innerHTML = '<p style="text-align: center; color: var(--error);">Error loading topics. Please try again.</p>';
@@ -723,172 +736,322 @@
             }
         }
 
-        // Check if user has subscription
-        function checkSubscription(grade, subject) {
-            return userSubscriptions.some(sub => 
-                (sub.type === 'grade' && sub.grade === grade) ||
-                (sub.type === 'subject' && sub.grade === grade && sub.subject === subject)
-            );
+        // Back to subjects
+        function backToSubjects() {
+            document.getElementById('topicsView').style.display = 'none';
+            showActiveSubscriptions();
         }
 
-        // Show subscription modal
-        function showSubscriptionModal(grade, subject) {
-            const modal = document.getElementById('subscriptionModal');
-            const modalBody = document.getElementById('modalBody');
+        // Open subscription modal
+        function openSubscriptionModal() {
+            document.getElementById('subscriptionModal').style.display = 'flex';
+            document.getElementById('gradeHeading').textContent = `Select Subjects for Grade ${currentGrade}`;
+            resetModal();
+            loadAvailableSubjects();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('subscriptionModal').style.display = 'none';
+            resetModal();
+        }
+
+        // Reset modal state
+        function resetModal() {
+            selectedSubjects = [];
+            selectedPlan = null;
+            isAllSubjectsSelected = false;
             
-            modalBody.innerHTML = `
-                <div class="pricing-options">
-                    <div class="pricing-option" onclick="selectPricing('subject')">
-                        <h3>${subject} Only</h3>
-                        <p class="price">₹100/month</p>
-                        <p style="font-size: 0.875rem; color: var(--text-light);">Access all ${subject} topics for Grade ${grade}</p>
-                    </div>
-                    <div class="pricing-option" onclick="selectPricing('grade')">
-                        <h3>Full Grade ${grade}</h3>
-                        <p class="price">₹800/month</p>
-                        <p style="font-size: 0.875rem; color: var(--success);">Save 20% - Access all subjects!</p>
-                    </div>
-                </div>
-                <button class="subscribe-btn" onclick="processPayment('${grade}', '${subject}')">Continue to Payment</button>
-            `;
+            document.getElementById('selectAllBtn').classList.remove('selected');
+            document.getElementById('subjectSelection').style.display = 'block';
+            document.getElementById('pricingSection').style.display = 'none';
+        }
+
+        // Load available subjects
+        function loadAvailableSubjects() {
+            const subjects = subjectsByGrade[currentGrade] || [];
+            const subjectGrid = document.getElementById('subjectGrid');
+            subjectGrid.innerHTML = '';
             
-            modal.style.display = 'flex';
-        }
-
-        let selectedPricing = null;
-
-        function selectPricing(type) {
-            selectedPricing = type;
-            document.querySelectorAll('.pricing-option').forEach(opt => opt.classList.remove('selected'));
-            event.target.closest('.pricing-option').classList.add('selected');
-        }
-
-        // Process payment (integrate with Razorpay)
-        async function processPayment(grade, subject) {
-            if (!selectedPricing) {
-                alert('Please select a subscription option');
+            // Get already subscribed subjects
+            const subscribedSubjects = new Set();
+            if (studentData.subscriptions) {
+                studentData.subscriptions.forEach(sub => {
+                    if (sub.status === 'active' && sub.grade === currentGrade) {
+                        const endDate = sub.endDate.toDate();
+                        if (endDate > new Date()) {
+                            if (sub.subjects === 'all') {
+                                subjects.forEach(s => subscribedSubjects.add(s));
+                            } else if (Array.isArray(sub.subjects)) {
+                                sub.subjects.forEach(s => subscribedSubjects.add(s));
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Show only unsubscribed subjects
+            const availableSubjects = subjects.filter(s => !subscribedSubjects.has(s));
+            
+            if (availableSubjects.length === 0) {
+                document.getElementById('subjectSelection').innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h3 style="color: var(--success);">🎉 All Subjects Already Purchased!</h3>
+                        <p style="margin-top: 1rem;">You have access to all subjects in Grade ${currentGrade}.</p>
+                        <button class="proceed-btn" onclick="closeModal()" style="margin-top: 1rem; width: auto; padding: 0.75rem 2rem;">Close</button>
+                    </div>
+                `;
                 return;
             }
+            
+            availableSubjects.forEach(subject => {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-option';
+                subjectDiv.textContent = subject;
+                subjectDiv.onclick = () => toggleSubject(subject);
+                subjectGrid.appendChild(subjectDiv);
+            });
+            
+            updatePricing();
+        }
 
-            // This is where you would integrate Razorpay
-            // For now, we'll simulate a successful payment
-            alert('Payment integration will be added here. For demo, subscription will be activated.');
+        // Select all subjects
+        function selectAllSubjects() {
+            const btn = document.getElementById('selectAllBtn');
+            const subjectElements = document.querySelectorAll('.subject-option');
+            
+            if (isAllSubjectsSelected) {
+                // Deselect all
+                isAllSubjectsSelected = false;
+                selectedSubjects = [];
+                btn.classList.remove('selected');
+                subjectElements.forEach(el => el.classList.remove('selected'));
+            } else {
+                // Select all
+                isAllSubjectsSelected = true;
+                selectedSubjects = [];
+                subjectElements.forEach(el => {
+                    selectedSubjects.push(el.textContent);
+                    el.classList.add('selected');
+                });
+                btn.classList.add('selected');
+            }
+            
+            updatePricing();
+        }
 
+        // Toggle individual subject
+        function toggleSubject(subject) {
+            const subjectEl = event.target;
+            
+            if (selectedSubjects.includes(subject)) {
+                selectedSubjects = selectedSubjects.filter(s => s !== subject);
+                subjectEl.classList.remove('selected');
+                isAllSubjectsSelected = false;
+                document.getElementById('selectAllBtn').classList.remove('selected');
+            } else {
+                selectedSubjects.push(subject);
+                subjectEl.classList.add('selected');
+                
+                // Check if all subjects are selected
+                const allSubjects = Array.from(document.querySelectorAll('.subject-option')).map(el => el.textContent);
+                if (selectedSubjects.length === allSubjects.length) {
+                    isAllSubjectsSelected = true;
+                    document.getElementById('selectAllBtn').classList.add('selected');
+                }
+            }
+            
+            updatePricing();
+        }
+
+        // Update pricing based on selections
+        function updatePricing() {
+            const hasSelections = selectedSubjects.length > 0;
+            
+            if (!hasSelections) {
+                document.getElementById('pricingSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('pricingSection').style.display = 'block';
+            
+            // Update summary
+            const summaryEl = document.getElementById('selectionSummary');
+            if (isAllSubjectsSelected) {
+                summaryEl.innerHTML = `<h4>Your Selection:</h4><p>All ${selectedSubjects.length} subjects for Grade ${currentGrade}</p>`;
+            } else {
+                summaryEl.innerHTML = `<h4>Your Selection:</h4><p>${selectedSubjects.length} subject${selectedSubjects.length > 1 ? 's' : ''}: ${selectedSubjects.join(', ')}</p>`;
+            }
+            
+            // Calculate prices
+            let monthlyPrice, sixMonthPrice, yearlyPrice;
+            
+            if (isAllSubjectsSelected) {
+                // All subjects pricing
+                monthlyPrice = 1000;
+                sixMonthPrice = 5000;
+                yearlyPrice = 8000;
+            } else {
+                // Individual subjects pricing
+                monthlyPrice = 200 * selectedSubjects.length;
+                sixMonthPrice = 800 * selectedSubjects.length;
+                yearlyPrice = 1200 * selectedSubjects.length;
+            }
+            
+            // Update pricing cards
+            const pricingCards = document.getElementById('pricingCards');
+            pricingCards.innerHTML = `
+                <div class="pricing-card" onclick="selectPlan('monthly', ${monthlyPrice})">
+                    <h4>Monthly</h4>
+                    <div class="price">₹${monthlyPrice.toLocaleString()}</div>
+                    <div class="price-info">Billed monthly</div>
+                </div>
+                
+                <div class="pricing-card" onclick="selectPlan('6months', ${sixMonthPrice})">
+                    <div class="popular-badge">SAVE 33%</div>
+                    <h4>6 Months</h4>
+                    <div class="price">₹${sixMonthPrice.toLocaleString()}</div>
+                    <div class="price-info">₹${Math.round(sixMonthPrice/6).toLocaleString()}/month</div>
+                </div>
+                
+                <div class="pricing-card" onclick="selectPlan('yearly', ${yearlyPrice})">
+                    <h4>12 Months</h4>
+                    <div class="price">₹${yearlyPrice.toLocaleString()}</div>
+                    <div class="price-info">₹${Math.round(yearlyPrice/12).toLocaleString()}/month</div>
+                    <small style="color: var(--success);">Best Value!</small>
+                </div>
+            `;
+        }
+
+        // Select plan
+        function selectPlan(type, price) {
+            selectedPlan = { type, price };
+            
+            // Update UI
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.pricing-card').classList.add('selected');
+            
+            // Enable proceed button
+            const proceedBtn = document.getElementById('proceedBtn');
+            proceedBtn.disabled = false;
+            proceedBtn.textContent = `Pay ₹${price.toLocaleString()}`;
+        }
+
+        // Process payment with Razorpay
+        async function processPayment() {
+            if (!selectedPlan) {
+                alert('Please select a plan');
+                return;
+            }
+            
+            // Create order details
+            const orderDetails = {
+                amount: selectedPlan.price * 100, // Razorpay expects amount in paise
+                currency: 'INR',
+                subjects: isAllSubjectsSelected ? 'all' : selectedSubjects,
+                grade: currentGrade,
+                planType: selectedPlan.type,
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                userName: studentData.name || currentUser.displayName
+            };
+            
+            // Razorpay options
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: orderDetails.amount,
+                currency: orderDetails.currency,
+                name: 'XED21',
+                description: `Grade ${currentGrade} - ${isAllSubjectsSelected ? 'All Subjects' : selectedSubjects.join(', ')}`,
+                handler: async function(response) {
+                    // Payment successful
+                    await handlePaymentSuccess(response, orderDetails);
+                },
+                prefill: {
+                    name: orderDetails.userName,
+                    email: orderDetails.userEmail
+                },
+                theme: {
+                    color: '#6366f1'
+                }
+            };
+            
+            // Open Razorpay checkout
+            const razorpay = new Razorpay(options);
+            razorpay.open();
+        }
+
+        // Handle payment success
+        async function handlePaymentSuccess(response, orderDetails) {
             try {
-                // Add subscription to user's account
+                // Calculate subscription duration
+                let duration;
+                switch(orderDetails.planType) {
+                    case 'monthly': duration = 1; break;
+                    case '6months': duration = 6; break;
+                    case 'yearly': duration = 12; break;
+                }
+                
+                // Create subscription object
                 const subscription = {
-                    type: selectedPricing,
-                    grade: parseInt(grade),
-                    subject: selectedPricing === 'subject' ? subject : null,
+                    grade: orderDetails.grade,
+                    subjects: orderDetails.subjects,
+                    duration: duration,
+                    amount: orderDetails.amount / 100,
+                    paymentId: response.razorpay_payment_id,
                     startDate: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'active'
+                    endDate: getEndDate(duration),
+                    status: 'active',
+                    planType: orderDetails.planType
                 };
-
+                
+                // Add subscription to user's account
                 await db.collection('users').doc(currentUser.uid).update({
                     subscriptions: firebase.firestore.FieldValue.arrayUnion(subscription)
                 });
-
-                // Reload user data
-                await loadUserData();
-                closeModal();
                 
-                // Refresh the current view
-                if (selectedPricing === 'subject') {
-                    showTopics(subject);
-                } else {
-                    showSubjects(grade);
-                }
-
-                alert('Subscription activated successfully!');
+                // Save payment record
+                await db.collection('payments').add({
+                    userId: currentUser.uid,
+                    ...orderDetails,
+                    paymentId: response.razorpay_payment_id,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'success'
+                });
+                
+                // Close modal and reload data
+                closeModal();
+                alert('Payment successful! Your subscription is now active.');
+                await loadStudentData();
+                
             } catch (error) {
                 console.error('Error processing subscription:', error);
-                alert('Error processing subscription. Please try again.');
+                alert('Error activating subscription. Please contact support.');
             }
         }
 
-        // Navigation functions
-        function showGrades() {
-            document.getElementById('gradesView').style.display = 'block';
-            document.getElementById('subjectsView').style.display = 'none';
-            document.getElementById('topicsView').style.display = 'none';
-            updateActiveNav(0);
-        }
-
-        function backToSubjects() {
-            document.getElementById('topicsView').style.display = 'none';
-            document.getElementById('subjectsView').style.display = 'block';
-        }
-
-        function showMySubjects() {
-            // Show only subscribed subjects
-            alert('My Subjects view coming soon!');
-            updateActiveNav(1);
-        }
-
-        function showProgress() {
-            alert('Progress tracking coming soon!');
-            updateActiveNav(2);
-        }
-
-        function showSettings() {
-            alert('Settings coming soon!');
-            updateActiveNav(3);
-        }
-
-        function updateActiveNav(index) {
-            document.querySelectorAll('.nav-item').forEach((item, i) => {
-                if (i === index) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-        }
-
-        // Modal functions
-        function closeModal() {
-            document.getElementById('subscriptionModal').style.display = 'none';
-            selectedPricing = null;
+        // Helper function to calculate end date
+        function getEndDate(months) {
+            const endDate = new Date();
+            endDate.setMonth(endDate.getMonth() + months);
+            return endDate;
         }
 
         // Logout
         async function logout() {
             if (confirm('Are you sure you want to logout? You will be logged out from all devices.')) {
                 try {
-                    // Clear all local storage and session storage
                     sessionStorage.clear();
                     localStorage.clear();
-                    
-                    // Delete any cached auth data
-                    if ('caches' in window) {
-                        const cacheNames = await caches.keys();
-                        await Promise.all(
-                            cacheNames.map(cacheName => caches.delete(cacheName))
-                        );
-                    }
-                    
-                    // Sign out from Firebase
-                    await firebase.auth().signOut();
-                    
-                    // Set persistence to NONE to ensure no session persistence
-                    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
-                    
-                    // Small delay to ensure auth state is cleared
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // Redirect to homepage with a cache-busting parameter
+                    await auth.signOut();
                     window.location.href = '/index.html?logout=' + Date.now();
                 } catch (error) {
                     console.error('Logout error:', error);
-                    // Even if there's an error, redirect to homepage
                     window.location.href = '/index.html?logout=' + Date.now();
                 }
             }
-        }
-
-        // Mobile menu toggle
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
         }
 
         // Close modal when clicking outside
