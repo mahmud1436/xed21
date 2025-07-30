@@ -1,71 +1,67 @@
-const functions = require("firebase-functions");
+const {onRequest} = require("firebase-functions/v2/https");
+const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 
-// Initialize admin SDK
 admin.initializeApp();
 
 const db = admin.firestore();
 
-// Existing hello world function
-exports.helloWorld = functions.https.onRequest((req, res) => {
-  functions.logger.info("Hello from XED21!", {structuredData: true});
+exports.helloWorld = onRequest((req, res) => {
+  logger.info("Hello from XED21!", {structuredData: true});
   res.send("Hello from Firebase Functions!");
 });
 
-// New function to handle user creation
-exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
-  try {
-    // Check if user document already exists
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    
-    if (!userDoc.exists) {
-      // Create a basic user document if it doesn't exist
-      await db.collection('users').doc(user.uid).set({
-        email: user.email,
+exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) {
+    console.log("No data associated with the event");
+    return;
+  }
+  const data = snapshot.data();
+
+  // Check if the document was just created
+  if (event.params.userId && !data.createdAt) {
+    try {
+      await db.collection("users").doc(event.params.userId).update({
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        userType: 'student', // Default type
-        subscriptions: [],
-        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      
-      functions.logger.log('Created user document for:', user.email);
-    } else {
-      // Update timestamp if document exists
-      await db.collection('users').doc(user.uid).update({
-        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       });
+      logger.log(`Set timestamps for user: ${event.params.userId}`);
+    } catch (error) {
+      logger.error(
+          `Error setting timestamps for user: ${event.params.userId}`,
+          error,
+      );
     }
-  } catch (error) {
-    functions.logger.error('Error creating user document:', error);
   }
 });
 
-// Function to ensure all user documents have proper timestamps
-exports.fixUserTimestamps = functions.https.onRequest(async (req, res) => {
+exports.fixUserTimestamps = onRequest(async (req, res) => {
   try {
-    const users = await db.collection('users').get();
+    const users = await db.collection("users").get();
     const batch = db.batch();
     let updated = 0;
-    
-    users.forEach(doc => {
+
+    users.forEach((doc) => {
       const data = doc.data();
       if (!data.createdAt) {
         batch.update(doc.ref, {
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
         });
         updated++;
       }
     });
-    
+
     if (updated > 0) {
       await batch.commit();
       res.send(`Updated ${updated} user documents with timestamps.`);
     } else {
-      res.send('All user documents already have timestamps.');
+      res.send("All user documents already have timestamps.");
     }
   } catch (error) {
-    functions.logger.error('Error fixing timestamps:', error);
-    res.status(500).send('Error: ' + error.message);
+    logger.error("Error fixing timestamps:", error);
+    res.status(500).send("Error: " + error.message);
   }
 });
