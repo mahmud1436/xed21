@@ -769,12 +769,12 @@ async function loadTopics(subject, grade) {
         topics.forEach(topic => {
             const topicCard = document.createElement('div');
             topicCard.className = 'topic-card';
-            topicCard.onclick = () => playGame(topic.id);
+            topicCard.onclick = () => openTopic(topic.htmlUrl);
             
             topicCard.innerHTML = `
                 <div class="topic-icon">${topic.icon || ''}</div>
                 <div class="topic-info">
-                    <h4>${topic.topic}</h4>
+                    <h4>${topic.topicName}</h4>
                     <p>Click to start learning!</p>
                 </div>
             `;
@@ -799,7 +799,7 @@ async function loadTopics(subject, grade) {
         // Back to subjects
         function backToSubjects() {
             document.getElementById('topicsView').style.display = 'none';
-            showActiveSubscriptions();
+            showActiveSubscriptions(studentData.subscriptions);
         }
 
         // Open subscription modal
@@ -1103,8 +1103,6 @@ async function loadTopics(subject, grade) {
         async function logout() {
             if (confirm('Are you sure you want to logout? You will be logged out from all devices.')) {
                 try {
-                    sessionStorage.clear();
-                    localStorage.clear();
                     await auth.signOut();
                     window.location.href = '/index.html?logout=' + Date.now();
                 } catch (error) {

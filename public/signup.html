@@ -556,7 +556,7 @@
                             phone: phone,
                             school: school,
                             class: studentClass,
-                            userType: 'student',
+                            userType: 'student', // Explicitly set user type
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                             subscriptions: [] // Empty initially
                         });
@@ -623,7 +623,7 @@
                             registrationNumber: regNumber,
                             email: email,
                             phone: phone,
-                            userType: 'school',
+                            userType: 'school', // Explicitly set user type
                             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                             subscriptions: [] // Empty initially
                         });

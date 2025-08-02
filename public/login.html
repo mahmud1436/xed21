@@ -291,8 +291,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Set persistence to LOCAL for permanent login
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        // Set persistence to SESSION for temporary login
+        auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
         function showMessage(text, type) {
             const messageEl = document.getElementById('message');
@@ -307,12 +307,8 @@
 
         // Check if user is already logged in
         firebase.auth().onAuthStateChanged((user) => {
-            // Don't auto-redirect if coming from logout
-            const urlParams = new URLSearchParams(window.location.search);
-            const fromLogout = urlParams.has('logout');
-            
-            if (user && !fromLogout) {
-                // User is logged in and not coming from logout - redirect to appropriate dashboard
+            if (user) {
+                // User is logged in - redirect to appropriate dashboard
                 db.collection('users').doc(user.uid).get().then(doc => {
                     if (doc.exists) {
                         const userData = doc.data();
@@ -329,80 +325,7 @@
                     console.error("Error checking user type:", error);
                     window.location.href = '/student-dashboard.html';
                 });
-            } else if (user && fromLogout) {
-                // User still signed in but coming from logout - force signout
-                firebase.auth().signOut().then(() => {
-                    // Clear the URL parameter
-                    window.history.replaceState({}, document.title, '/login.html');
-                }).catch(() => {
-                    // Clear the URL parameter even if signout fails
-                    window.history.replaceState({}, document.title, '/login.html');
-                });
             }
-            // If no user and fromLogout is true, just stay on login page (already logged out)
         });
-
-        // Login form handler
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                try {
-                    // Sign in
-                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-                    
-                    // Get user data to check type
-                    const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
-                    
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        showMessage('Login successful! Redirecting...', 'success');
-                        
-                        // Redirect based on user type
-                        setTimeout(() => {
-                            if (userData.userType === 'school') {
-                                window.location.href = '/school-dashboard.html';
-                            } else {
-                                window.location.href = '/student-dashboard.html';
-                            }
-                        }, 1000);
-                    } else {
-                        // User document doesn't exist, create basic one
-                        await db.collection('users').doc(userCredential.user.uid).set({
-                            email: email,
-                            userType: 'student',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        window.location.href = '/student-dashboard.html';
-                    }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    let errorMessage = 'Login failed. ';
-                    
-                    switch(error.code) {
-                        case 'auth/user-not-found':
-                            errorMessage += 'No account found with this email.';
-                            break;
-                        case 'auth/wrong-password':
-                            errorMessage += 'Incorrect password.';
-                            break;
-                        case 'auth/invalid-email':
-                            errorMessage += 'Invalid email address.';
-                            break;
-                        case 'auth/too-many-requests':
-                            errorMessage += 'Too many failed attempts. Please try again later.';
-                            break;
-                        default:
-                            errorMessage += error.message;
-                    }
-                    
-                    showMessage(errorMessage, 'error');
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+        
+ 
